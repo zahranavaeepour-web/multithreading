@@ -10,25 +10,22 @@ def thinking(i):
     time.sleep(5)
 
 def check(i,locks,n):
-    locks[i].acquire()
-    if i + 1 < n :
-        m = i + 1
-    else:
-        m = 0
-    if locks[m].acquire(blocking= False):
-        dining(i)
-        locks[m].release()
-        locks[i].release()
+    while True :
+        locks[i].acquire()
+        if locks[(i+1)%n].acquire(blocking= False):
+            dining(i)
+            locks[(i+1)%n].release()
+            locks[i].release()
+            break
+        else:
+            locks[i].release()
+            thinking(i)
         
-    else:
-        locks[i].release()
-        thinking(i)
-        check(i,locks,n)
 
 
 
 if __name__ == "__main__":
-    n=50
+    n=20
     thread_list = []
     locks =[Lock() for i in range(n)]
     for i in range(n):
